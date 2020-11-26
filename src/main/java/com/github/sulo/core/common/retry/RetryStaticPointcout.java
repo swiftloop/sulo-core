@@ -22,6 +22,6 @@ public class RetryStaticPointcout extends StaticMethodMatcherPointcutAdvisor {
 
     @Override
     public boolean matches(Method method, Class<?> targetClass) {
-        return false;
+        return method.getAnnotation(Retry.class) != null;
     }
 }
