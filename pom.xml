@@ -5,7 +5,7 @@
 
     <groupId>win.oscene</groupId>
     <artifactId>sulo-core</artifactId>
-    <version>0.2</version>
+    <version>0.4</version>
     <name>sulo-core</name>
     <description>web core</description>
 
@@ -77,6 +77,20 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.30</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.11.3</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.11.2</version>
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>

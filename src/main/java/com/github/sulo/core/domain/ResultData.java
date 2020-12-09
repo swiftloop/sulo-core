@@ -17,9 +17,16 @@ import java.util.function.Supplier;
 public class ResultData<T> {
 
 
-    private final String message;
-    private final Integer code;
-    private final T data;
+    private  String message;
+    private  Integer code;
+    private  T data;
+
+    /**
+     * jackson 需要无参的构造函数
+     */
+    public ResultData(){
+
+    }
 
 
     public ResultData(Integer code, T data, String message) {
@@ -40,6 +47,10 @@ public class ResultData<T> {
 
     public static <T> ResultData<T> ok(T data) {
         return ok(data, "OK");
+    }
+
+    public static <T> ResultData<T> ok(){
+        return ok(null);
     }
 
     public static <T> ResultData<T> okMsg(String message) {
@@ -88,6 +99,30 @@ public class ResultData<T> {
         return of(e.getCode(), null, e.getMessage());
     }
 
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -1,6 +1,6 @@
 package com.github.sulo.core.util;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.ServletRequest;
 import java.util.Map;
 
 /**
@@ -9,7 +9,7 @@ import java.util.Map;
 public abstract class ParamsUtils {
 
     @SuppressWarnings("unchecked")
-    public static Map<String, String> resolve(HttpServletRequest request) {
+    public static Map<String, String> resolve(ServletRequest request) {
         final Map<String, String[]> parameterMap = request.getParameterMap();
         final Map<String, String> map = FastCreateUtils.createHashMap(parameterMap.keySet().size());
         parameterMap.forEach((k, v) -> {
@@ -24,6 +24,10 @@ public abstract class ParamsUtils {
         });
         return map;
     }
+
+
+
+
 
 
 }
