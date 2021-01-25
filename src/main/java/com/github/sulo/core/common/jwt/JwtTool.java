@@ -10,6 +10,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
 import java.security.Key;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
@@ -28,8 +29,9 @@ public abstract class JwtTool {
         JWT_CONFIG.setAesEncode(false);
         JWT_CONFIG.setAesKey(Design.generatorKey(128));
         JWT_CONFIG.setAlgorithm(SignatureAlgorithm.HS256);
-        JWT_CONFIG.setExpireDate(Date.from(LocalDateTime.now().plusHours(12).toInstant(ZoneOffset.ofHours(8))));
-        JWT_CONFIG.setKey(Keys.secretKeyFor(JWT_CONFIG.algorithm));
+        JWT_CONFIG.setExpireSecond(Duration.ofDays(7).getSeconds());
+        JWT_CONFIG.setKey(Keys.secretKeyFor(JWT_CONFIG.getAlgorithm()));
+        JWT_CONFIG.setIssuer("SNB");
     }
 
 
@@ -37,15 +39,17 @@ public abstract class JwtTool {
         try {
             String value;
             value = OBJECT_MAPPER.writeValueAsString(user);
-            if (JWT_CONFIG.aesEncode) {
-                value = Design.encode(value, JWT_CONFIG.aesKey);
+            if (JWT_CONFIG.isAesEncode()) {
+                value = Design.encode(value, JWT_CONFIG.getAesKey());
             }
             return Jwts.builder()
-                    .setIssuer(JWT_CONFIG.Issuer)
+                    .setIssuer(JWT_CONFIG.getIssuer())
                     .setAudience(value)
                     .setNotBefore(new Date())
-                    .setExpiration(JWT_CONFIG.expireDate)
-                    .signWith(JWT_CONFIG.key, JWT_CONFIG.algorithm)
+                    .setExpiration(Date.from(LocalDateTime.now()
+                            .plusSeconds(JWT_CONFIG.getExpireSecond())
+                            .toInstant(ZoneOffset.ofHours(8))))
+                    .signWith(JWT_CONFIG.getKey(), JWT_CONFIG.getAlgorithm())
                     .compact();
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,11 +63,15 @@ public abstract class JwtTool {
             throw new BizException(500, "token must not be null");
         }
         try {
-            final Jws<Claims> claimsJws = Jwts.parserBuilder().requireIssuer(JWT_CONFIG.Issuer).setAllowedClockSkewSeconds(60)
-                    .setSigningKey(JWT_CONFIG.key).build().parseClaimsJws(token);
+            final Jws<Claims> claimsJws = Jwts.parserBuilder()
+                    .requireIssuer(JWT_CONFIG.getIssuer())
+                    .setAllowedClockSkewSeconds(60)
+                    .setSigningKey(JWT_CONFIG.getKey())
+                    .build()
+                    .parseClaimsJws(token);
             String jsonValue = claimsJws.getBody().getAudience();
-            if (JWT_CONFIG.aesEncode) {
-                jsonValue = Design.decode(jsonValue, JWT_CONFIG.aesKey);
+            if (JWT_CONFIG.isAesEncode()) {
+                jsonValue = Design.decode(jsonValue, JWT_CONFIG.getAesKey());
             }
             return OBJECT_MAPPER.readValue(jsonValue, tClass);
         } catch (Exception e) {
@@ -78,20 +86,20 @@ public abstract class JwtTool {
 
     public static class JwtConfig {
 
-        private String Issuer;
+        private String issuer;
         private String aesKey;
         private boolean aesEncode;
         private Key key;
         private SignatureAlgorithm algorithm;
-        private Date expireDate;
+        private long expireSecond;
 
 
         public String getIssuer() {
-            return Issuer;
+            return issuer;
         }
 
         public void setIssuer(String issuer) {
-            Issuer = issuer;
+            this.issuer = issuer;
         }
 
         public String getAesKey() {
@@ -126,12 +134,12 @@ public abstract class JwtTool {
             this.algorithm = algorithm;
         }
 
-        public Date getExpireDate() {
-            return expireDate;
+        public long getExpireSecond() {
+            return expireSecond;
         }
 
-        public void setExpireDate(Date expireDate) {
-            this.expireDate = expireDate;
+        public void setExpireSecond(long expireSecond) {
+            this.expireSecond = expireSecond;
         }
     }
 
